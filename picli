@@ -1,0 +1,31 @@
+use 5.010;
+use Mojo::UserAgent;
+use Mojo::IOLoop;
+
+# Open WebSocket to echo service
+my $ua = Mojo::UserAgent->new;
+$ua->websocket('ws://localhost/echo' => sub {
+  my ($ua, $tx) = @_;
+
+  # Check if WebSocket handshake was successful
+  say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
+
+  # Wait for WebSocket to be closed
+  $tx->on(finish => sub {
+    my ($tx, $code, $reason) = @_;
+    say "WebSocket closed with status $code.";
+  });
+
+  # Close WebSocket after receiving one message
+  $tx->on(message => sub {
+    my ($tx, $msg) = @_;
+    say "WebSocket message: $msg";
+    $tx->finish;
+  });
+
+  # Send a message to the server
+  $tx->send('Hi!');
+});
+
+# Start event loop if necessary
+Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
