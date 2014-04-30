@@ -1,77 +1,42 @@
+#!/usr/bin/env perl
 use Mojolicious::Lite;
 
-get '/' => 'webrtc';
-# ninefingers:0x78d3d8a3ab85ef53746c566062fd4beb
-get '/turn' => { json => {"username" => "ninefingers", "password" => "0x78d3d8a3ab85ef53746c566062fd4beb", "uris" => ["turn:kit.cm:3478?transport=udp", "turn:kit.cm:3478?transport=tcp", "turn:kit.cm:3479?transport=udp", "turn:kit.cm:3479?transport=tcp"]} };
-
-websocket '/echo' => sub {
+get '/' => sub {
   my $self = shift;
-  $self->on(json => sub {
-    my ($self, $hash) = @_;
-    say "Json: $hash->{msg}";
-    $self->send({json => $hash});
-  });
+  $self->render('index');
 };
 
 app->start;
-
 __DATA__
 
-@@ webrtc.html.ep
-
+@@ index.html.ep
 <!DOCTYPE html>
 <html>
-<head>
-<title>WebRTC Reference App</title>
+  <head><title>Raspberry Pi</title></head>
+  <body>
+<p>In this screen shot we connected a Windows desktop behind NAT to
+a Linux desktop (i.e. a Raspberry Pi) also behind NAT by using nothing more
+than a modern web browser on the Windows computer.  No plugins.  No fancy tricks. 
+It just worked.  It's one of the most amazing things I've seen.  As you can see from the attached screenshot,
+the Linux VNC
+server session was accessible in a modern web browser's HTML5 canvas.  The
+web browser merely needed to access the iwebpp.io web server (which is open
+source) listening on port
+51688 in the cloud which connects the session with the Linux VNC server's session. 
+We can set up any number of X servers on a single Pi and any number of users
+can connect to and control a single session simultaneously.</p>
 
-<meta http-equiv="X-UA-Compatible" content="chrome=1"/>
-
-<link rel="canonical" href="https://6-dot-apprtc.appspot.com/?r=65820089"/>
-<!-- <link rel="canonical" href="http://pi.dev.kit.cm"/> -->
-<link rel="stylesheet" href="css/main.css" />
-
-<script type="text/javascript" src="js/channel.js"></script>
-<script src="js/main.js"></script>
-<!-- Load the polyfill to switch-hit between Chrome and Firefox -->
-<script src="js/adapter.js"></script>
-
-</head>
-<body>
-<script type="text/javascript">
-  var errorMessages = [];
-  var channelToken = 'AHRlWrrXjg1FNVX7Wo5rs6Ro2bL9lkW89dR4kuV2QwkS77J4Vt_9whL9W2q3FSFdxRA9pdmeFhmDN3PwDIKVaTOd7KnMhioLepw9WAi8IFY99b-HEN3zdso';
-  var me = '85509610';
-  var roomKey = '65820089';
-  var roomLink = 'https://6-dot-apprtc.appspot.com/?r=65820089';
-  //var roomLink = 'http://pi.dev.kit.cm';
-  var initiator = 0;
-  var pcConfig = {"iceServers": [{"urls": "stun:stun.l.google.com:19302"}]};
-  var pcConstraints = {"optional": []};
-  var offerConstraints = {"optional": [], "mandatory": {}};
-  var mediaConstraints = {"audio": true, "video": true};
-  var turnUrl = 'https://computeengineondemand.appspot.com/turn?username=85509610&key=4080218913';
-  //var turnUrl = 'http://pi.dev.kit.cm/turn?username=85509610&key=4080218913';
-  var stereo = false;
-  var audio_send_codec = '';
-  var audio_receive_codec = 'opus/48000';
-  setTimeout(initialize, 1);
-</script>
-<div id="container" ondblclick="enterFullScreen()">
-  <div id="card">
-    <div id="local">
-      <video id="localVideo" autoplay="autoplay" muted="true"/>
-    </div>
-    <div id="remote">
-      <video id="remoteVideo" autoplay="autoplay">
-      </video>
-      <div id="mini">
-        <video id="miniVideo" autoplay="autoplay" muted="true"/>
-      </div>
-    </div>
-  </div>
-</div>
-</body>
-<footer id="status">
-</footer>
-<div id="infoDiv"></div>
+<p>The plan is to create a Kloud interface that will allow a technician to
+start up a new X session and connect it with iwebpp.io software in our Kloud and then
+present the dynamic link to the technician's browser to be clicked on and
+gain access to the Pi's X session.  From there, of course, the sky's the
+limit.  In the screenshot, I have a calculator running.  Of course I could
+just as easily launch a terminal or wireshark, rdesktop/vnc, or a web
+browser.  And with a 4G interface and on a mediocre UPS, we'll be able to
+have eyes on the network at any time under any conditions and with little
+effort on the technician's part.  Long-term, we aim to create a browser
+plugin for KMS that would give technicians access to this interface from
+within KMS itself.</p>
+    <img src="/img/ss.png" />
+  </body>
 </html>
